@@ -30,7 +30,7 @@ def writeToOutput(assignments):
 def setSeats(row, i, j):
     length = len(row)
     for k in range(i - 3, j + 3):
-        if i >= 0 and i < length:
+        if k >= 0 and k < length:
             row[k] = True
     return row
 
@@ -53,6 +53,7 @@ def checkRow(theater, rowNum, request, assignments):
             for ind in range(i, j):
                 assignments[request[0]].append((rowNum, ind))
             return (theater, assignments)
+        i = j
         count = numPeople
     return None
 
@@ -62,26 +63,20 @@ def assign():
     numargs = len(sys.argv) - 1
     if numargs != 1:
         raise Exception('Error: {} arguments detected. Please enter 1 argument\n'.format(numargs))
-    
     requests = parseFile(sys.argv[1])
-    
     theater = [[False for _ in range(cols)] for _ in range(rows)]
 
     # Order in which the rows are checked for seats
     priority = [12, 10, 14, 8, 16, 6, 18, 4, 2, 0] # Starts at 2/3 away from screen, goes to 1/2, and then alternates above and below
     assignments = defaultdict(list)
-    accomodateAll = True
     for request in requests:
         assigned = False
         for p in priority:
-            if theater[p][0] == True:
-                continue
-            else:
-                assignment = checkRow(theater, p, request, assignments)
-                if assignment is not None:
-                    theater, assignments = assignment
-                    assigned = True
-                    break
+            assignment = checkRow(theater, p, request, assignments)
+            if assignment is not None:
+                theater, assignments = assignment
+                assigned = True
+                break
         
         if not assigned:
             raise Exception("Error: Could not accomodate all requests\n")
